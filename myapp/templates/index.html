@@ -225,18 +225,21 @@
 </head>
 <body>
   
-<header>
-  <a href="index.html" style="text-decoration: none; color: white;">
-    <h1>✔️Pomofocus</h1>
-  </a>
-  <div class="controls">
-    <button onclick="location.href='{% url 'signup' %}'">Sign Up</button>
-    <button onclick="location.href='{% url 'login' %}'">Log In</button>
-    <button onclick="location.href='{% url 'report' %}'">Report</button>
-    <button onclick="location.href='{% url 'settings' %}'">Settings</button>
-  </div>  
-</header>
-
+    <header>
+        <a href="{% url 'home' %}" style="text-decoration: none; color: white;">
+          <h1>✔️Pomofocus</h1>
+        </a>
+        <div class="controls">
+          {% if user.is_authenticated %}
+            <button onclick="location.href='{% url 'report' %}'">Report</button>
+            <button onclick="location.href='{% url 'settings' %}'">Settings</button>
+            <button onclick="location.href='{% url 'logout' %}'">Log Out</button>
+          {% else %}
+            <button onclick="location.href='{% url 'signup' %}'">Sign Up</button>
+            <button onclick="location.href='{% url 'login' %}'">Log In</button>
+          {% endif %}
+        </div>  
+      </header>      
   <div class="timer">
     <div class="mode-buttons">
       <button onclick="setMode(1500, this)" class="active">Pomodoro</button>

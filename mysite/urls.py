@@ -1,23 +1,20 @@
-"""
-URL configuration for mysite project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
+from django.urls import path
+from django.contrib.auth import views as auth_views
+from myapp import views
 from django.contrib import admin
-from django.urls import path, include  # include is important!
+
 
 urlpatterns = [
+    # Authentication URLs
+    path('logout/', views.custom_logout, name='logout'),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),  # Django's default login view
+    path('signup/', views.signup_view, name='signup'),  # Custom signup view for user registration
+
+    # Protected Views
+    path('report/', views.report_view, name='report'),  # Only accessible if logged in
+    path('settings/', views.settings_view, name='settings'),  # Only accessible if logged in
+
+    # Home page
+    path('', views.home, name='home'),
     path('admin/', admin.site.urls),
-    path('', include('myapp.urls')),  # This connects your app URLs!
 ]

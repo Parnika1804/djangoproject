@@ -1,18 +1,62 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .forms import RegisterForm, LoginForm
 
 def home(request):
     return render(request, 'index.html')
 
 def login_view(request):
-    return render(request, 'login.html')
+    if request.user.is_authenticated:
+        return redirect('home')
+        
+    if request.method == 'POST':
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Welcome back, {username}!")
+                next_url = request.GET.get('next', 'home')
+                return redirect(next_url)
+        else:
+            messages.error(request, "Invalid username or password")
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
 
 def signup_view(request):
-    return render(request, 'signup.html')
+    if request.user.is_authenticated:
+        return redirect('home')
+        
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Account created successfully!")
+            return redirect('home')
+        else:
+            messages.error(request, "Please correct the errors below")
+    else:
+        form = RegisterForm()
+    return render(request, 'signup.html', {'form': form})
 
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+@login_required
 def report_view(request):
     return render(request, 'report.html')
 
+@login_required
 def settings_view(request):
     return render(request, 'settings.html')
 
+def custom_logout(request):
+    logout(request)
+    return redirect('login')
